@@ -23,7 +23,7 @@ def run_game():
         #Watch the mouse and keypboard events.
         gf.check_events(ai_settings, screen, ship, bullets)
         ship.update()
-        bullets.update()
+        gf.update_bullets(bullets)
         gf.update_screen(ai_settings, screen, ship, bullets)
 
 run_game()
