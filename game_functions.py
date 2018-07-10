@@ -118,19 +118,31 @@ def change_fleet_direction(ai_settings, aliens):
 
 def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
     """Respond to ship being hit by an alien"""
-    # Decreament ship lefts
-    stats.ships_left -= 1
+    if stats.ships_left >= 1:
+        # Decreament ship lefts
+        stats.ships_left -= 1
 
-    # Empty the list of alien and bullets
-    aliens.empty()
-    bullets.empty()
+        # Empty the list of alien and bullets
+        aliens.empty()
+        bullets.empty()
 
-    # Create a new fleet and center the ship
-    create_fleet(ai_settings, screen, ship, aliens)
-    ship.center_ship()
+        # Create a new fleet and center the ship
+        create_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
 
-    # Pause
-    sleep(0.5)
+        # Pause
+        sleep(0.5)
+    else:
+        stats.game_active = False
+
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+    """Check if any alien has reached the bottom of the screen"""
+    screen_rect = screen.get_rect()
+    for alien in aliens.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            # Treat this as the ship got hit
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            break
 
 def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     """Check if the fleet is at the edge and then update the positions of all items in the fleet"""
@@ -140,3 +152,5 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     # Check for alien-ship collision
     if pygame.sprite.spritecollideany(ship, aliens):
         ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+    # Look for aliens hitting the bottom of the screen
+    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
