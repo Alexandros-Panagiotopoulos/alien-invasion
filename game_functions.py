@@ -65,19 +65,29 @@ def get_number_aliens_x(ai_settings, alien_width):
     number_aliens_x = int(available_space_x / (2 * alien_width))
     return number_aliens_x
 
-def creat_alien(ai_settings, screen, aliens, alien_number):
-    """Creat an alien and place it in the raw"""
+def get_number_rows(ai_settings, ship_height, alien_height):
+    """Determien the number of rows of aliens that fit on the screen"""
+    available_space_y = (ai_settings.screen_height - (3 * alien_height) - ship_height)
+    number_rows = int(available_space_y / (2 * alien_height))
+    return number_rows
+
+
+def create_alien(ai_settings, screen, aliens, alien_number, row_number):
+    """Create an alien and place it in the raw"""
     alien = Alien(ai_settings, screen)
     alien_width = alien.rect.width
-    alien.x = alien_width +2 * alien_width * alien_number
+    alien.x = alien_width + 2 * alien_width * alien_number
     alien.rect.x = alien.x
+    alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
     aliens.add(alien)
 
-def create_fleet(ai_settings, screen, aliens):
-    """Creat a full fleet of aliens"""
-    # Creat an alien and find the number of aliens in a row
+def create_fleet(ai_settings, screen, ship, aliens):
+    """Create a full fleet of aliens"""
+    # Create an alien and find the number of aliens in a row
     alien = Alien(ai_settings, screen)
     number_aliens_x = get_number_aliens_x(ai_settings, alien.rect.width)
-    # Creat the first raw of alien
-    for alien_number in range(number_aliens_x):
-        creat_alien(ai_settings, screen, aliens, alien_number)
+    number_rows = get_number_rows(ai_settings, ship.rect.height, alien.rect.height)
+    # Create the fleet of aliens
+    for row_number in range(number_rows):
+        for alien_number in range(number_aliens_x):
+            create_alien(ai_settings, screen, aliens, alien_number, row_number)
