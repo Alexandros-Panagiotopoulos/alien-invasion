@@ -48,7 +48,8 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
     if button_clicked and not stats.game_active:
         # Hide the mouse cursor
         pygame.mouse.set_visible(False)
-        # Reset the game statistics
+        # Reset the game statistics and speed-level
+        ai_settings.initialize_dynamic_settings()
         stats.reset_stats()
         stats.game_active = True
 
@@ -60,7 +61,7 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
         create_fleet(ai_settings, screen, ship, aliens)
         ship.center_ship()
 
-def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
+def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
     """update images on the screen and flip to the new screen"""
     #redraw the screen during each pass through the loop.
     screen.fill(ai_settings.bg_color)
@@ -69,6 +70,8 @@ def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button
         bullet.draw_bullet()
     ship.blitme()
     aliens.draw(screen)
+    # Draw the score information
+    sb.show_score()
     # Draw the button if the game is inactive
     if not stats.game_active:
         play_button.draw_button()
@@ -90,8 +93,9 @@ def check_bullet_alien_collision(ai_settings, screen, ship, aliens, bullets):
     # Remove any bullets or aliens that have collided
     collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
     if len(aliens) == 0:
-        # Destroy existing bullets and create a new fleet
+        # Destroy existing bullets, update level, create a new fleet
         bullets.empty()
+        ai_settings.increse_speed()
         create_fleet(ai_settings, screen, ship, aliens)
 
 def get_number_aliens_x(ai_settings, alien_width):
