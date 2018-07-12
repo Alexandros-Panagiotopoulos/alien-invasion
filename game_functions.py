@@ -29,20 +29,20 @@ def check_keyup_events(event, ship):
     elif event.key == pygame.K_LEFT:
         ship.moving_left = False
 
-def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets):
+def check_events(ai_settings, screen, stats, play_button, ship, sb, aliens, bullets):
     """Respond to keypresses and mouse events"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+            check_play_button(ai_settings, screen, stats, play_button, ship, sb, aliens, bullets, mouse_x, mouse_y)
         elif event.type == pygame.KEYDOWN:
             check_keydown_events(event, ai_settings, screen, ship, bullets)
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
 
-def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+def check_play_button(ai_settings, screen, stats, play_button, ship, sb, aliens, bullets, mouse_x, mouse_y):
     """Start a new game when a player click play"""
     button_clicked  = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
@@ -52,6 +52,12 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
         ai_settings.initialize_dynamic_settings()
         stats.reset_stats()
         stats.game_active = True
+
+        # Reset the scoreboard images
+        sb.prep_score()
+        sb.prep_high_score()
+        sb.prep_level()
+        sb.prep_ships()
 
         #empty the list of alien and bullets
         aliens.empty()
@@ -105,6 +111,8 @@ def check_bullet_alien_collision(ai_settings, screen, stats, sb, ship, aliens, b
             # Destroy existing bullets, update level, create a new fleet
             bullets.empty()
             ai_settings.increse_speed()
+            stats.level += 1
+            sb.prep_level()
             create_fleet(ai_settings, screen, ship, aliens)
 
 def get_number_aliens_x(ai_settings, alien_width):
@@ -158,6 +166,7 @@ def ship_hit(ai_settings, stats, screen, ship, sb, aliens, bullets):
     if stats.ships_left >= 1:
         # Decreament ship lefts
         stats.ships_left -= 1
+        sb.prep_ships()
 
         # Empty the list of alien and bullets
         aliens.empty()
